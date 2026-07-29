@@ -1,13 +1,16 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  ChevronDown,
   CreditCard,
+  HeartHandshake,
   Instagram,
   MapPin,
   PackageCheck,
   ShoppingBag,
+  Sprout,
   Store,
   Truck,
 } from "lucide-react";
@@ -31,8 +34,19 @@ const purchaseIcons = {
   "package-check": PackageCheck,
 };
 
+const trustIcons = {
+  truck: Truck,
+  "credit-card": CreditCard,
+  sprout: Sprout,
+  "heart-handshake": HeartHandshake,
+};
+
 export default function HomePage() {
   const productRowRef = useRef(null);
+  const [activeTrustItem, setActiveTrustItem] = useState(null);
+  const selectedTrustItem = trustItems.find(
+    (item) => item.id === activeTrustItem,
+  );
 
   const scrollProducts = (direction) => {
     productRowRef.current?.scrollBy({
@@ -114,8 +128,10 @@ export default function HomePage() {
                 <MapPin size={16} aria-hidden="true" />
                 Origen mendocino
               </li>
-              <li>Aceites de oliva seleccionados</li>
-              <li>Productos para tu mesa y regalos</li>
+              <li>
+                Aceite de oliva virgen extra, con primera extracción en frío
+              </li>
+              <li>Productos de alto valor nutricional</li>
             </ul>
           </div>
           <a href="#categories" className="hero__scroll-cue">
@@ -127,12 +143,66 @@ export default function HomePage() {
         <section className="trust-strip" aria-labelledby="trust-title">
           <div className="container">
             <h2 id="trust-title" className="sr-only">
-              Una selección mendocina para tu mesa
+              Beneficios de comprar en Flor Mía
             </h2>
             <div className="trust-strip__items">
-              {trustItems.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
+              {trustItems.map((item) => {
+                const Icon = trustIcons[item.icon];
+                const isActive = item.id === activeTrustItem;
+
+                return (
+                  <button
+                    id={`trust-${item.id}-trigger`}
+                    className={`trust-strip__item${isActive ? " is-active" : ""}`}
+                    key={item.id}
+                    type="button"
+                    aria-expanded={isActive}
+                    aria-controls="trust-detail-panel"
+                    onClick={() =>
+                      setActiveTrustItem((current) =>
+                        current === item.id ? null : item.id,
+                      )
+                    }
+                  >
+                    <Icon
+                      className="trust-strip__icon"
+                      size={24}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
+                    <span className="trust-strip__copy">
+                      <strong>{item.title}</strong>
+                      <small>{item.subtitle}</small>
+                    </span>
+                    <ChevronDown
+                      className="trust-strip__chevron"
+                      size={18}
+                      aria-hidden="true"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              id="trust-detail-panel"
+              className="trust-strip__detail"
+              role={selectedTrustItem ? "region" : undefined}
+              aria-labelledby={
+                selectedTrustItem
+                  ? `trust-${selectedTrustItem.id}-trigger`
+                  : undefined
+              }
+              hidden={!selectedTrustItem}
+            >
+              {selectedTrustItem ? (
+                <>
+                  <span>Más información</span>
+                  <div>
+                    <h3>{selectedTrustItem.title}</h3>
+                    <p>{selectedTrustItem.detail}</p>
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
         </section>

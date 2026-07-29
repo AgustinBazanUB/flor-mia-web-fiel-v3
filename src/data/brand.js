@@ -23,18 +23,46 @@ export const navigation = [
 ];
 
 export const trustItems = [
-  "Origen Mendoza",
-  "Aceite de oliva virgen extra",
-  "Productos regionales seleccionados",
-  "Atención personalizada",
+  {
+    id: "shipping-amba",
+    icon: "truck",
+    title: "Envío sin cargo",
+    subtitle: "En el AMBA",
+    detail:
+      "El envío no tiene cargo dentro del AMBA. Al coordinar la compra, confirmamos que tu domicilio esté incluido en la zona de entrega.",
+  },
+  {
+    id: "installments",
+    icon: "credit-card",
+    title: "Hasta 3 cuotas sin interés",
+    subtitle: "Miércoles y sábados",
+    detail:
+      "Los miércoles y sábados podés abonar en hasta 3 cuotas sin interés. La modalidad de pago se coordina antes de confirmar el pedido.",
+  },
+  {
+    id: "producer-to-table",
+    icon: "sprout",
+    title: "Del productor a tu mesa",
+    subtitle: "Directo del productor a tu mesa",
+    detail:
+      "Acercamos a tu mesa una selección de productos mendocinos directamente de sus productores, cuidando el origen y la elección de cada producto.",
+  },
+  {
+    id: "personal-service",
+    icon: "heart-handshake",
+    title: "Atención personalizada",
+    subtitle: "Te ayudamos a elegir",
+    detail:
+      "Te acompañamos para elegir según tus gustos, el uso o la ocasión: consumo diario, picadas, regalos y más.",
+  },
 ];
 
 export const purchaseInformation = [
   {
     icon: "truck",
     title: "Envíos",
-    text: "Zonas, costos, plazos y restricciones pendientes de confirmación.",
-    linkLabel: "Información pendiente",
+    text: "Sin cargo dentro del AMBA. La cobertura exacta se confirma antes de coordinar la entrega.",
+    linkLabel: "Ver condiciones",
   },
   {
     icon: "store",
@@ -45,8 +73,8 @@ export const purchaseInformation = [
   {
     icon: "credit-card",
     title: "Medios de pago",
-    text: "Los medios y condiciones se publicarán cuando estén integrados.",
-    linkLabel: "Integración pendiente",
+    text: "Hasta 3 cuotas sin interés los miércoles y sábados. El checkout online todavía no procesa cobros.",
+    linkLabel: "Ver modalidad",
   },
   {
     icon: "package-check",

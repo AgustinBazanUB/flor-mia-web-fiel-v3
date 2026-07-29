@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .netlify/
+graphify-out/
 .env
 .env.local
 *.log

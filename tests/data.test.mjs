@@ -6,6 +6,7 @@ import { dirname, resolve } from "node:path";
 import { categories } from "../src/data/categories.js";
 import { products } from "../src/data/products.js";
 import { oliveProfiles } from "../src/data/oliveProfiles.js";
+import { trustItems } from "../src/data/brand.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(currentDirectory, "..");
@@ -48,4 +49,20 @@ test("las seis categorías y los seis varietales requeridos están presentes", (
     oliveProfiles.map((profile) => profile.name),
     ["Arbequina", "Arbosana", "Blend", "Coratina", "Picual", "Arauco"],
   );
+});
+
+test("los cuatro beneficios comerciales tienen contenido desplegable", () => {
+  assert.equal(trustItems.length, 4);
+  assert.equal(trustItems[0].title, "Envío sin cargo");
+  assert.equal(trustItems[0].subtitle, "En el AMBA");
+  assert.equal(trustItems[1].title, "Hasta 3 cuotas sin interés");
+  assert.equal(trustItems[1].subtitle, "Miércoles y sábados");
+
+  for (const item of trustItems) {
+    assert.ok(item.id);
+    assert.ok(item.icon);
+    assert.ok(item.title);
+    assert.ok(item.subtitle);
+    assert.ok(item.detail);
+  }
 });

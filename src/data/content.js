@@ -52,12 +52,12 @@ export const faqItems = [
   {
     question: "¿Cómo funcionan los envíos y el retiro?",
     answer:
-      "Zonas, costos, plazos, dirección y horarios están pendientes de confirmación y se mostrarán antes del pago.",
+      "El envío es sin cargo dentro del AMBA. La cobertura exacta y la coordinación de la entrega se confirman antes de completar la compra. La información de retiro en el local continúa pendiente.",
   },
   {
     question: "¿Qué medios de pago aceptan?",
     answer:
-      "Los medios de pago todavía no están integrados. El checkout no simula una compra ni una confirmación real.",
+      "Los miércoles y sábados podés abonar en hasta 3 cuotas sin interés. El checkout online todavía no procesa pagos: la modalidad disponible se coordina antes de confirmar el pedido.",
   },
   {
     question: "¿Realizan ventas corporativas o mayoristas?",

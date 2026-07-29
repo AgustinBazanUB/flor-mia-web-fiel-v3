@@ -168,7 +168,7 @@ Editar `src/data/brand.js` para cargar:
 - `address`;
 - `openingHours`.
 
-También deben reemplazarse los textos pendientes de envíos, retiro, pagos y cambios en `purchaseInformation`, y las respuestas en `src/data/content.js`.
+La franja comercial ya comunica envío sin cargo en el AMBA y hasta 3 cuotas sin interés los miércoles y sábados. Todavía deben completarse la cobertura detallada, la coordinación, el retiro, los medios habilitados y las condiciones de cambios en `purchaseInformation` y `src/data/content.js`.
 
 Mientras esos datos sean `null`, el sitio evita enlaces falsos y muestra el estado pendiente.
 
@@ -227,5 +227,5 @@ Desde Netlify se puede importar el repositorio de GitHub o desplegar el build co
 - reseñas reales;
 - historia completa y productores;
 - dirección, horarios, email y WhatsApp;
-- envíos, retiro, pagos y cambios;
+- cobertura detallada de envíos, retiro, medios habilitados y cambios;
 - integración de pagos, pedidos, inventario, newsletter y recuperación.
