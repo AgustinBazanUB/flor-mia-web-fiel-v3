@@ -25,9 +25,9 @@ export const brand = {
 };
 
 export const announcementMessages = [
-  "PRODUCTOS REGIONALES ORIGINARIOS DE MENDOZA",
   "ENVÍOS A TODO EL PAÍS",
-  "RETIRO EN LOCAL",
+  "LOCAL EN CABA",
+  "CUOTAS SIN INTERÉS",
 ];
 
 export const navigation = [
