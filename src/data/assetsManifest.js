@@ -171,8 +171,11 @@ const productAssetById = Object.freeze({
   "wine-bazan": products.bazanWine,
   "oil-trio-500cc": products.oliveOilTrio500cc,
   "oil-arbequina": oliveVarieties.arbequina,
+  "oil-arbosana": products.oliveOilTrio500cc,
   "oil-coratina": oliveVarieties.coratina,
   "oil-blend": oliveVarieties.blend,
+  "oil-picual": products.oliveOilTrio500cc,
+  "oil-arauco": products.oliveOilTrio500cc,
 });
 
 export const assetsManifest = Object.freeze({
