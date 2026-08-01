@@ -1,6 +1,8 @@
 name: Validar responsive Flor Mía
 
 on:
+  push:
+    branches: [codex/mejoras-responsive-mobile]
   pull_request:
     branches: [main]
   workflow_dispatch:
