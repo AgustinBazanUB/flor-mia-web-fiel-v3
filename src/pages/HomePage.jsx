@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import {
   BadgeCheck,
+  Check,
   CreditCard,
   Droplets,
   Gift,
@@ -8,6 +10,7 @@ import {
   Leaf,
   MapPin,
   PackageCheck,
+  Plus,
   Sprout,
   Truck,
   UsersRound,
@@ -16,9 +19,10 @@ import { Link } from "../router";
 import { assetsManifest, getCategoryAsset } from "../data/assetsManifest";
 import { brand } from "../data/brand";
 import { categories } from "../data/categories";
-import { oliveProfiles } from "../data/oliveProfiles";
-import { products } from "../data/products";
+import { oliveProfileById } from "../data/oliveProfiles";
+import { productById, products } from "../data/products";
 import { promotions } from "../data/promotions";
+import { useCart } from "../context/CartContext";
 import PageMeta from "../components/PageMeta";
 import ProductCard from "../components/ProductCard";
 
@@ -52,6 +56,27 @@ const tableProducts = [
   [assetsManifest.products.malbecSalt, "fm-table-scene__salt"],
 ];
 
+const intensityOptions = [
+  {
+    value: "Suave",
+    label: "SUAVE",
+    Icon: Leaf,
+    profileIds: ["arbosana", "arbequina"],
+  },
+  {
+    value: "Intermedio",
+    label: "INTERMEDIO",
+    Icon: Sprout,
+    profileIds: ["blend", "picual"],
+  },
+  {
+    value: "Intenso",
+    label: "INTENSO",
+    Icon: Grape,
+    profileIds: ["coratina", "arauco"],
+  },
+];
+
 function ResponsiveStorefront({ className = "", story = false }) {
   const asset = story ? assetsManifest.local.story : assetsManifest.local.hero;
 
@@ -77,7 +102,7 @@ function ResponsiveStorefront({ className = "", story = false }) {
         width={asset.width}
         height={asset.height}
         alt={asset.alt}
-        fetchpriority="high"
+        fetchPriority="high"
         decoding="async"
       />
     </picture>
@@ -119,10 +144,88 @@ function CategoryArtwork({ category }) {
   );
 }
 
+function OilProfileCard({ profile }) {
+  const { addItem } = useCart();
+  const [feedbackVersion, setFeedbackVersion] = useState(0);
+  const product = productById[profile.productId];
+  const added = feedbackVersion > 0;
+  const unavailable = !product || product.stock === "out" || product.active === false;
+
+  useEffect(() => {
+    if (!feedbackVersion) return undefined;
+    const timeout = window.setTimeout(() => setFeedbackVersion(0), 1600);
+    return () => window.clearTimeout(timeout);
+  }, [feedbackVersion]);
+
+  const handleAdd = () => {
+    if (unavailable) return;
+    addItem(product, {
+      format: "500 cc",
+      variant: product.attributes?.variety ?? profile.name,
+    });
+    setFeedbackVersion((current) => current + 1);
+  };
+
+  return (
+    <article className="fm-variety-card">
+      <img
+        src={profile.image}
+        alt={
+          profile.imageStatus === "verified-product"
+            ? `Botella real de aceite Flor Mía variedad ${profile.name}`
+            : `Fotografía editorial de aceites Flor Mía; imagen específica de ${profile.name} pendiente`
+        }
+        width="900"
+        height="1350"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="fm-variety-card__content">
+        <h3>{profile.name}</h3>
+        <p>{profile.descriptor ?? "Perfil por validar"}</p>
+        <button
+          className={`fm-variety-card__add${added ? " is-added" : ""}`}
+          type="button"
+          onClick={handleAdd}
+          disabled={unavailable}
+          aria-label={
+            unavailable
+              ? `${profile.name} no está disponible`
+              : added
+                ? `${profile.name} agregado al carrito`
+                : `Agregar ${profile.name} de 500 cc al carrito`
+          }
+        >
+          {added ? (
+            <Check size={15} aria-hidden="true" />
+          ) : (
+            <Plus size={15} aria-hidden="true" />
+          )}
+          {unavailable
+            ? "NO DISPONIBLE"
+            : added
+              ? "AGREGADO"
+              : "AGREGAR AL CARRITO"}
+        </button>
+        <span className="sr-only" aria-live="polite" aria-atomic="true">
+          {added ? `${profile.name} agregado al carrito.` : ""}
+        </span>
+      </div>
+    </article>
+  );
+}
+
 export default function HomePage() {
+  const [selectedIntensity, setSelectedIntensity] = useState("Suave");
   const featuredProducts = products
     .filter((product) => product.editorialFeatured)
     .slice(0, 6);
+  const selectedOption =
+    intensityOptions.find((option) => option.value === selectedIntensity) ??
+    intensityOptions[0];
+  const selectedProfiles = selectedOption.profileIds
+    .map((profileId) => oliveProfileById[profileId])
+    .filter(Boolean);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -306,37 +409,54 @@ export default function HomePage() {
                 <span>GUÍA DE INTENSIDAD</span>
                 <i aria-hidden="true" />
               </div>
-              <div className="fm-intensity" aria-label="Escala de intensidad">
-                <span><Leaf size={16} aria-hidden="true" /> SUAVE</span>
-                <span><Sprout size={16} aria-hidden="true" /> MEDIO</span>
-                <span><Grape size={16} aria-hidden="true" /> INTENSO</span>
+              <div
+                className="fm-intensity"
+                role="group"
+                aria-label="Filtrar aceites por intensidad"
+              >
+                {intensityOptions.map(({ value, label, Icon }) => {
+                  const isActive = selectedIntensity === value;
+                  return (
+                    <button
+                      className={`fm-intensity__button${isActive ? " is-active" : ""}`}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => setSelectedIntensity(value)}
+                      key={value}
+                    >
+                      <span className="fm-intensity__label">
+                        <Icon size={16} aria-hidden="true" />
+                        {label}
+                      </span>
+                      {isActive ? (
+                        <Check
+                          className="fm-intensity__selected-icon"
+                          size={14}
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
+              <p className="sr-only" aria-live="polite" aria-atomic="true">
+                Mostrando aceites de intensidad {selectedIntensity}.
+              </p>
               <div className="fm-variety-grid">
-                {oliveProfiles.map((profile) => (
-                  <article className="fm-variety-card" key={profile.id}>
-                    <img
-                      src={profile.image}
-                      alt={
-                        profile.imageStatus === "verified-product"
-                          ? `Botella real de aceite Flor Mía variedad ${profile.name}`
-                          : `Fotografía editorial de aceites Flor Mía; imagen específica de ${profile.name} pendiente`
-                      }
-                      width="900"
-                      height="1350"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div>
-                      <h3>{profile.name}</h3>
-                      <p>{profile.descriptor ?? "Perfil por validar"}</p>
-                    </div>
-                  </article>
+                {selectedProfiles.map((profile) => (
+                  <OilProfileCard profile={profile} key={profile.id} />
                 ))}
               </div>
               <ul className="fm-guide-badges" aria-label="Características">
-                <li><PackageCheck size={19} aria-hidden="true" /> Productos reales</li>
-                <li><BadgeCheck size={19} aria-hidden="true" /> Perfiles editables</li>
-                <li><MapPin size={19} aria-hidden="true" /> Selección mendocina</li>
+                <li>
+                  <PackageCheck size={19} aria-hidden="true" /> Productos reales
+                </li>
+                <li>
+                  <BadgeCheck size={19} aria-hidden="true" /> Perfiles editables
+                </li>
+                <li>
+                  <MapPin size={19} aria-hidden="true" /> Selección mendocina
+                </li>
               </ul>
             </div>
           </div>
@@ -349,7 +469,11 @@ export default function HomePage() {
         >
           <div className="fm-page fm-table__layout">
             <div className="fm-table__copy">
-              <h2 id="table-title">ARMÁ TU<br />MESA MENDOCINA</h2>
+              <h2 id="table-title">
+                ARMÁ TU
+                <br />
+                MESA MENDOCINA
+              </h2>
               <p>
                 Combiná lo mejor de nuestra tierra y convertí cada comida en
                 una experiencia única. Descubrí sabores que se disfrutan y se
@@ -359,7 +483,10 @@ export default function HomePage() {
                 VER SUGERENCIAS
               </Link>
             </div>
-            <div className="fm-table-scene" aria-label="Selección de productos reales Flor Mía">
+            <div
+              className="fm-table-scene"
+              aria-label="Selección de productos reales Flor Mía"
+            >
               {tableProducts.map(([asset, className]) => (
                 <img
                   className={className}
@@ -372,7 +499,9 @@ export default function HomePage() {
                   key={className}
                 />
               ))}
-              <span className="fm-table-scene__branch" aria-hidden="true">❧</span>
+              <span className="fm-table-scene__branch" aria-hidden="true">
+                ❧
+              </span>
             </div>
           </div>
         </section>
