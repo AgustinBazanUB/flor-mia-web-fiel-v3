@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { announcementMessages } from "../data/brand";
 
 export default function AnnouncementBar() {
@@ -6,7 +5,7 @@ export default function AnnouncementBar() {
     <div className="announcement-bar" aria-label="Información de la tienda">
       <p className="announcement-bar__messages">
         {announcementMessages.map((message, index) => (
-          <Fragment key={message}>
+          <span className="announcement-bar__item" key={message}>
             {index > 0 ? (
               <span
                 className="announcement-bar__separator"
@@ -16,7 +15,7 @@ export default function AnnouncementBar() {
               </span>
             ) : null}
             <span className="announcement-bar__message">{message}</span>
-          </Fragment>
+          </span>
         ))}
       </p>
     </div>
