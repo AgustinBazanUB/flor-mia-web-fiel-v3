@@ -4,9 +4,9 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { categories } from "../src/data/categories.js";
-import { products } from "../src/data/products.js";
+import { productById, products } from "../src/data/products.js";
 import { oliveProfiles } from "../src/data/oliveProfiles.js";
-import { trustItems } from "../src/data/brand.js";
+import { announcementMessages, trustItems } from "../src/data/brand.js";
 import { assetsManifest } from "../src/data/assetsManifest.js";
 import { promotions } from "../src/data/promotions.js";
 
@@ -62,6 +62,14 @@ test("el manifiesto usa el logo, el local y los seis destacados reales", () => {
   assert.equal(assetsManifest.featured.length, 6);
 });
 
+test("la barra informativa conserva los tres mensajes aprobados", () => {
+  assert.deepEqual(announcementMessages, [
+    "ENVÍOS A TODO EL PAÍS",
+    "LOCAL EN CABA",
+    "CUOTAS SIN INTERÉS",
+  ]);
+});
+
 test("la home solo publica las dos promociones aprobadas", () => {
   assert.deepEqual(
     promotions.map(({ title, subtitle }) => [title, subtitle]),
@@ -72,12 +80,35 @@ test("la home solo publica las dos promociones aprobadas", () => {
   );
 });
 
-test("las seis categorías y los seis varietales requeridos están presentes", () => {
+test("los seis varietales tienen intensidad y producto de 500 cc", () => {
   assert.equal(categories.length, 6);
   assert.deepEqual(
     oliveProfiles.map((profile) => profile.name),
-    ["Arbequina", "Arbosana", "Blend", "Coratina", "Picual", "Arauco"],
+    ["Arbequina", "Arbosana", "Blend IG", "Coratina", "Picual", "Arauco"],
   );
+
+  const expectedIntensity = {
+    arbequina: "Suave",
+    arbosana: "Suave",
+    blend: "Intermedio",
+    picual: "Intermedio",
+    coratina: "Intenso",
+    arauco: "Intenso",
+  };
+
+  for (const profile of oliveProfiles) {
+    assert.equal(profile.intensity, expectedIntensity[profile.id], profile.id);
+    assert.ok(profile.productId, `${profile.id} debe tener productId`);
+    const product = productById[profile.productId];
+    assert.ok(product, `${profile.productId} debe existir`);
+    assert.equal(product.categoryId, "olive_oil");
+    assert.deepEqual(product.formats, ["500 cc"]);
+    assert.equal(product.active, true);
+    assert.equal(product.price, null);
+    assert.equal(product.stock, "unknown");
+  }
+
+  assert.equal(productById["oil-blend"].slug, "aceite-blend");
 });
 
 test("los cuatro beneficios comerciales tienen contenido desplegable", () => {
