@@ -1,36 +1,28 @@
 # Flor Mía — Ecommerce de productos regionales mendocinos
 
-Sitio ecommerce editorial creado con React y Vite para Flor Mía. La experiencia presenta al aceite de oliva como producto estrella sin ocultar frutos secos, aceitunas, mermeladas, sales condimentadas y regalos.
+Nueva versión de la web de Flor Mía, reconstruida con React y Vite a partir del diseño aprobado v3. La home conserva el orden, la composición editorial, la paleta oscura/marfil/dorada y el comportamiento responsive de la referencia.
 
-Esta versión es una base funcional y honesta: no inventa precios, stock, sabores, reseñas, políticas, productores ni datos de contacto. Todo dato comercial faltante está marcado como pendiente.
+- Sitio nuevo: https://flor-mia-web-fiel-v3.netlify.app
+- Repositorio: https://github.com/AgustinBazanUB/flor-mia-web-fiel-v3
+- Rama de trabajo: `codex/flor-mia-fiel-v3`
 
-## Producción
+El sitio anterior no forma parte de este despliegue y no debe usarse como destino de `git push` ni de `netlify deploy`.
 
-- Sitio: https://flor-mia-productos-mendocinos.netlify.app
-- Repositorio: https://github.com/AgustinBazanUB/flor-mia-productos-mendocinos
+## Tecnologías y arquitectura
 
-## Qué incluye
+- React 18 y Vite 6.
+- Router liviano existente en `src/router.jsx`.
+- Datos comerciales centralizados en `src/data/`.
+- Carrito persistente mediante `localStorage`.
+- Checkout preparado para una integración futura, sin simular pagos.
+- Lucide React como único sistema de iconos.
+- Cormorant Garamond para títulos y Manrope para interfaz.
+- CSS base en `src/styles.css` y reconstrucción visual v3 en `src/styles-v3.css`.
+- Configuración SPA para Netlify en `netlify.toml`.
 
-- Home editorial completa y responsive.
-- Navegación directa por seis categorías.
-- Buscador global con tolerancia a errores, agrupación por categoría y navegación por teclado.
-- Catálogo filtrable por categoría, ocasión y texto.
-- Fichas de producto preparadas para atributos específicos.
-- Sección y explorador de seis varietales de aceite.
-- Comparador sensorial de hasta tres varietales, listo para datos validados.
-- Descubrimiento por ocasión sin crear packs inexistentes.
-- Carrito multcategoría persistente en `localStorage`.
-- Líneas separadas por producto, presentación y variante.
-- Cantidades, eliminación y recomendaciones cruzadas no invasivas.
-- Checkout de cuatro pasos con borrador persistente, validación y resumen.
-- Estados vacíos honestos para reseñas, contacto, políticas y pagos.
-- SEO base, Open Graph, WebSite, Organization y FAQPage.
-- Redirección SPA y caché de imágenes para Netlify.
-- Placeholders WebP locales con la proporción y fotografía requerida.
+## Ejecutar localmente
 
-## Ejecutar el proyecto
-
-Requisitos: Node.js 20 o superior.
+Requiere Node.js 20 o superior.
 
 ```bash
 npm install
@@ -43,7 +35,7 @@ Build de producción:
 npm run build
 ```
 
-Pruebas de datos y búsqueda:
+Pruebas de datos, assets y búsqueda:
 
 ```bash
 npm test
@@ -55,177 +47,161 @@ Vista previa del build:
 npm run preview
 ```
 
-## Estructura editable
+## Imágenes reales y manifiesto
 
-- `src/data/brand.js`: marca, navegación, Instagram, contacto e información de compra.
-- `src/data/categories.js`: categorías, jerarquía, textos, facetas e imágenes.
-- `src/data/products.js`: productos, atributos, formatos, etiquetas, ocasiones y relaciones.
-- `src/data/oliveProfiles.js`: varietales y futuros perfiles sensoriales.
-- `src/data/content.js`: preguntas frecuentes, galería y contenido editorial.
-- `src/context/CartContext.jsx`: persistencia y reglas del carrito.
-- `src/pages/`: home, catálogo, producto, historia y checkout.
-- `public/images/placeholders/`: imágenes temporales semánticas.
-- `scripts/generate_placeholders.py`: regeneración reproducible de placeholders.
+Los recursos optimizados están en `public/images/flor-mia/`. Todos derivan de la carpeta `Productos` entregada para este proyecto; no se utilizan fotografías externas, stock ni imágenes generadas por IA.
 
-## Agregar una categoría
+El mapeo semántico está en `src/data/assetsManifest.js`. Cada entrada conserva:
 
-1. Crear una entrada en `src/data/categories.js` con un `id` estable y único.
-2. Definir `slug`, nombre, estado comercial, facetas e imagen.
-3. Agregar el acceso correspondiente en `src/data/brand.js` si debe aparecer en el header.
-4. Asignar productos a ese `categoryId`.
+- ruta pública;
+- ancho y alto reales;
+- texto alternativo;
+- ruta relativa del archivo original;
+- variantes responsive cuando corresponde.
 
-Los grids, filtros y resultados de búsqueda consumen estos datos; no es necesario rediseñar la home.
+Uso actual:
 
-## Agregar o actualizar un producto
+- Hero e Historia: foto real del frente del local.
+- Categorías: aceites, almendras, aceitunas, mermelada y sal reales.
+- Regalos: collage CSS de productos reales; no representa un pack comercial.
+- Destacados: aceite 5 L, aceite 2 L, almendras, pistachos, aceitunas griegas y mermelada de pera.
+- Guía de aceites: Arbequina, Blend y Coratina verificadas por su fotografía; Arbosana, Picual y Arauco quedan señaladas como imágenes específicas pendientes.
+- Armá tu mesa: composición CSS con aceite, aceitunas, almendras, vino, mermelada y sal reales.
+- Open Graph: recorte real del frente del local en `public/images/flor-mia/og-flor-mia.webp`.
 
-Editar `src/data/products.js`. Cada producto debe incluir:
+### Regenerar imágenes optimizadas
 
-- `id` y `slug` únicos;
-- `categoryId`;
-- nombre, subcategoría y descripción;
-- ruta local de imagen;
-- `price`, `stock`, `active` y `dataStatus`;
-- `formats`;
-- `attributes` específicos de la categoría;
-- `tags`, `uses` y `occasions`;
-- `editorialFeatured` cuando corresponda.
-
-Ejemplos de atributos:
-
-- aceite: `variety`, `intensity`, y más adelante frutado, amargor y picor;
-- aceituna: `variety`, `color`, `stone`;
-- fruto seco: `type`, `preparation`, `salt`, `shell`;
-- mermelada: `flavor`, `sweetness`;
-- sal: `flavor`, `intensity`.
-
-No agregues propiedades de aceite a categorías que no las necesitan.
-
-## Precios, stock, tamaños y variantes
-
-Actualmente todos los precios son `null`, el stock es `unknown` y las presentaciones están pendientes. Para habilitar una venta real:
-
-1. reemplazar `price: null` por el precio real;
-2. reemplazar `stock: "unknown"` por el estado conectado al inventario;
-3. cargar los formatos reales en `formats`;
-4. ampliar `attributes` con variantes verificadas;
-5. conectar el proveedor de pago y el backend antes de habilitar confirmaciones.
-
-El carrito genera una línea por combinación de producto, formato y variante.
-
-## Mermeladas, sales y regalos
-
-- Sabores reales de mermelada: agregar productos en `src/data/products.js` con `categoryId: "jams"` y `attributes.flavor`.
-- Sales: hoy solo están identificadas Malbec y ajo. Agregar otras únicamente cuando estén confirmadas.
-- Regalos: crear SKUs solo para packs realmente disponibles. Las selecciones por ocasión de la home no son bundles comerciales.
-
-## Perfiles de aceite
-
-Editar `src/data/oliveProfiles.js`. Los seis varietales ya están creados, pero figuran con `verified: false`.
-
-Cuando Flor Mía valide frutado, amargor, picor, intensidad y uso:
-
-1. agregar esos valores a cada perfil;
-2. mostrarlos en `src/components/SensoryComparison.jsx`;
-3. conservar valores textuales además de cualquier barra visual;
-4. cambiar el estado a verificado.
-
-## Reemplazar imágenes
-
-Mantener el mismo nombre y proporción permite reemplazar una fotografía sin tocar componentes.
-
-- Hero: 16:9.
-- Categorías, productos, varietales, editoriales y local: 4:5.
-- Destacado de aceites, mesa y pack: 16:10.
-- CTA final: 21:9.
-- Open Graph: 1200 × 630.
-
-Prioridad recomendada:
-
-1. local, frente y estanterías;
-2. productos y packaging reales;
-3. aceites y varietales;
-4. composiciones con varias categorías;
-5. usos gastronómicos;
-6. clientes solo con autorización.
-
-No usar hotlinking ni presentar imágenes de stock como si fueran de Flor Mía.
-
-Los placeholders pueden regenerarse con:
+El script no modifica los originales:
 
 ```bash
-python scripts/generate_placeholders.py
+py -3 scripts/optimize_flor_mia_assets.py --source "C:\ruta\a\Productos"
 ```
 
-La tarjeta social conceptual está en `public/og.png` y `public/images/placeholders/og-flor-mia-productos-mendoza.webp`.
+### Reemplazar una fotografía
 
-## Contacto y políticas
+1. Guardar el nuevo original dentro de la carpeta fuente de Productos.
+2. Actualizar su ruta en `scripts/optimize_flor_mia_assets.py`.
+3. Regenerar los WebP.
+4. Corregir ruta, dimensiones, `alt` y `source` en `src/data/assetsManifest.js`.
+5. Ejecutar `npm test` y revisar la home en 1440, 1024, 768 y 390 px.
 
-Editar `src/data/brand.js` para cargar:
+El caché de imágenes de Netlify dura una semana y permite reemplazos con nombres semánticos sin dejar archivos obsoletos durante un año.
 
-- `whatsapp`;
-- `whatsappUrl`;
-- `email`;
-- `address`;
-- `openingHours`.
+## Contenido y catálogo
 
-La franja comercial ya comunica envío sin cargo en el AMBA y hasta 3 cuotas sin interés los miércoles y sábados. Todavía deben completarse la cobertura detallada, la coordinación, el retiro, los medios habilitados y las condiciones de cambios en `purchaseInformation` y `src/data/content.js`.
+- `src/data/brand.js`: marca, navegación, contacto y ayudas.
+- `src/data/categories.js`: seis categorías y composición de Regalos.
+- `src/data/products.js`: catálogo real visible y atributos por categoría.
+- `src/data/oliveProfiles.js`: seis perfiles editables de aceite.
+- `src/data/promotions.js`: las dos promociones aprobadas.
+- `src/data/assetsManifest.js`: relación entre originales y archivos públicos.
+- `src/data/content.js`: contenido editorial legado y placeholders no visibles en la home v3.
 
-Mientras esos datos sean `null`, el sitio evita enlaces falsos y muestra el estado pendiente.
+### Agregar una categoría
 
-## Carrito y versionado
+1. Crear una entrada con `id` y `slug` únicos en `src/data/categories.js`.
+2. Definir nombre, descripción, facetas e imagen local.
+3. Agregarla a la navegación en `src/data/brand.js` si corresponde.
+4. Asignar productos mediante `categoryId`.
 
-La clave actual es `flor-mia-cart-v1`, declarada en `src/context/CartContext.jsx`.
+### Agregar un producto
 
-Si cambia de forma incompatible la estructura de una línea:
+Crear una entrada en `src/data/products.js` con:
 
-1. incrementar `STORAGE_VERSION`;
-2. cambiar la clave a `flor-mia-cart-v2`;
-3. agregar una migración si se deben conservar carritos anteriores.
+- `id` y `slug` únicos;
+- `categoryId` existente;
+- nombre, descripción y subcategoría;
+- imagen local mapeada en el manifiesto;
+- `formats` y atributos realmente verificados;
+- `tags`, usos y ocasiones;
+- `editorialFeatured` si debe aparecer entre los seis destacados.
 
-Para limpiar el carrito durante desarrollo:
+No se deben agregar campos de aceite a productos de otras categorías.
+
+### Precios y stock
+
+Los valores desconocidos permanecen como:
 
 ```js
-localStorage.removeItem("flor-mia-cart-v1");
+price: null
+stock: "unknown"
+dataStatus: "pending"
 ```
 
-## Checkout, pagos y backend
+Para habilitar una venta real deben cargarse precio, stock, formatos y variantes confirmados, y conectar un backend de catálogo e inventario.
 
-El checkout guarda un borrador local en `flor-mia-checkout-draft-v1`. No procesa pagos ni genera pedidos.
+### Perfiles de aceite
 
-Para producción faltan:
+Editar `src/data/oliveProfiles.js`. No publicar frutado, amargor, picor, intensidad o usos hasta que Flor Mía los valide. Al recibir una foto específica, agregarla al optimizador y actualizar `imageStatus` y `productId`.
 
-- API o CMS del catálogo;
+### Promociones
+
+Editar únicamente `src/data/promotions.js`. La home actual muestra las dos promociones autorizadas:
+
+- ¡Promociones! — Envío sin cargo AMBA.
+- 3 cuotas sin interés — Miércoles y sábados.
+
+No agregar descuentos, packs ni beneficios sin confirmación comercial.
+
+## Contacto, horarios y redes
+
+Editar `brand.contact` en `src/data/brand.js` para cargar dirección, teléfono, email, mapa y horarios. Instagram ya utiliza el enlace recibido en el proyecto.
+
+Mientras falten datos, el footer muestra un mensaje pendiente y evita enlaces falsos.
+
+## Buscador
+
+Busca por producto, categoría, subcategoría, variedad, sabor, intensidad, uso, ocasión y tamaño. Normaliza acentos, tolera errores leves y traduce las ocasiones internas al español (`desayuno`, `diario`, `picada`, `regalo`).
+
+Incluye estado sin resultados, navegación por teclado, foco contenido y cierre con Escape.
+
+## Carrito y checkout
+
+El carrito utiliza la clave `flor-mia-cart-v1`, persiste cantidades y separa líneas por producto, formato y variante. El drawer contiene el foco, restaura el disparador, admite cambios de cantidad y eliminación, y comunica altas mediante `aria-live`.
+
+El checkout guarda un borrador en `flor-mia-checkout-draft-v1` y maneja fallos de almacenamiento. Sus cuatro pasos son una interfaz preparada: no procesa tarjetas, no cobra y no genera pedidos.
+
+Para producción todavía hacen falta:
+
+- backend o CMS del catálogo;
 - inventario y precios;
-- cálculo de envíos y opción de retiro;
+- cálculo de envío y retiro;
 - proveedor de pagos;
-- creación del pedido;
-- confirmación real;
-- email o WhatsApp de recuperación con consentimiento;
-- analítica real, reutilizando `src/utils/analytics.js`.
+- creación y confirmación de pedidos;
+- notificaciones reales;
+- políticas comerciales verificadas.
 
-No guardar secretos ni credenciales en el frontend.
+## SEO
+
+La web incluye title, description, canonical, Open Graph, favicon, `robots.txt`, `sitemap.xml` y datos estructurados `Organization`, `WebSite`, `SearchAction`, `CollectionPage`, `Product` y `BreadcrumbList`.
+
+No se publican `LocalBusiness`, reseñas ni ofertas mientras falten datos reales.
 
 ## Publicar en Netlify
 
-`netlify.toml` ya define:
+El proyecto nuevo ya está asociado al sitio `flor-mia-web-fiel-v3`.
 
-- build: `npm run build`;
-- carpeta publicada: `dist`;
-- fallback SPA para rutas como `/productos`, `/producto/:slug`, `/nosotros` y `/checkout`.
+```bash
+npm run build
+netlify deploy --prod --dir dist
+```
 
-Desde Netlify se puede importar el repositorio de GitHub o desplegar el build con Netlify CLI.
+Antes de desplegar, verificar:
 
-## Datos que siguen pendientes
+```bash
+netlify status
+```
 
-- catálogo completo;
-- precios, stock, tamaños y formatos;
-- fotografías del local y productos;
-- logo gráfico;
-- sabores reales de mermelada;
-- otras sales y regalos reales;
-- perfiles técnicos de aceites;
-- reseñas reales;
-- historia completa y productores;
-- dirección, horarios, email y WhatsApp;
-- cobertura detallada de envíos, retiro, medios habilitados y cambios;
-- integración de pagos, pedidos, inventario, newsletter y recuperación.
+El ID correcto comienza con `bfa1b3fc`; si aparece otro proyecto, detener el despliegue y volver a vincular el sitio nuevo.
+
+## Datos pendientes
+
+- precios y stock;
+- dirección, teléfono, email y horarios;
+- condiciones completas de envío, retiro y cambios;
+- perfiles sensoriales validados;
+- fotografías específicas de Arbosana, Picual y Arauco;
+- productores, historia ampliada, certificaciones y reseñas reales;
+- integración de pagos, pedidos e inventario.
+
+El detalle de implementación y validación está en `docs/IMPLEMENTACION-FLOR-MIA-V3.md`.

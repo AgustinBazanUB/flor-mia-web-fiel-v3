@@ -9,6 +9,8 @@ export default function PlaceholderImage({
   eager = false,
   sizes,
   showCaption = false,
+  width,
+  height,
 }) {
   return (
     <figure
@@ -22,6 +24,8 @@ export default function PlaceholderImage({
         fetchpriority={eager ? "high" : "auto"}
         decoding="async"
         sizes={sizes}
+        width={width}
+        height={height}
       />
       {showCaption ? (
         <figcaption>

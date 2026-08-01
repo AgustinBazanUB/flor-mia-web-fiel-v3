@@ -37,9 +37,17 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState(readDraft);
   const [errors, setErrors] = useState({});
+  const [storageMessage, setStorageMessage] = useState("");
 
   useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      setStorageMessage("");
+    } catch {
+      setStorageMessage(
+        "No pudimos guardar el borrador en este dispositivo. Podés continuar, pero los datos no persistirán.",
+      );
+    }
   }, [draft]);
 
   useEffect(() => {
@@ -138,6 +146,11 @@ export default function CheckoutPage() {
                       Comprá como invitado. Tus datos quedan guardados en este
                       dispositivo mientras completás el flujo.
                     </p>
+                    {storageMessage ? (
+                      <p className="field-error" role="status">
+                        {storageMessage}
+                      </p>
+                    ) : null}
                     <div className="form-grid">
                       <label className="field-label field-label--full">
                         Nombre y apellido

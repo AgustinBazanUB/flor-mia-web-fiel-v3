@@ -57,21 +57,6 @@ export function CartProvider({ children }) {
     }
   }, [items]);
 
-  useEffect(() => {
-    if (!isCartOpen) return undefined;
-
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") setCartOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    document.body.classList.add("no-scroll");
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.classList.remove("no-scroll");
-    };
-  }, [isCartOpen]);
-
   const addItem = useCallback((product, options = {}) => {
     const format = options.format ?? product.formats?.[0] ?? "";
     const variant =
@@ -140,6 +125,14 @@ export function CartProvider({ children }) {
     setStatusMessage("Tu selección quedó vacía.");
   }, []);
 
+  const openCart = useCallback(() => {
+    setCartOpen(true);
+  }, []);
+
+  const closeCart = useCallback(() => {
+    setCartOpen(false);
+  }, []);
+
   const detailedItems = useMemo(
     () =>
       items
@@ -179,10 +172,10 @@ export function CartProvider({ children }) {
       statusMessage,
       setStatusMessage,
       openCart: () => {
-        setCartOpen(true);
+        openCart();
         trackEvent("view_cart", { quantity: unitCount });
       },
-      closeCart: () => setCartOpen(false),
+      closeCart,
       addItem,
       updateQuantity,
       removeItem,
@@ -201,6 +194,8 @@ export function CartProvider({ children }) {
       updateQuantity,
       removeItem,
       clearCart,
+      openCart,
+      closeCart,
     ],
   );
 

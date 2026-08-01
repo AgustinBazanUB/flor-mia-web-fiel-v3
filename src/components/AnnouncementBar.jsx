@@ -1,12 +1,23 @@
+import { Fragment } from "react";
+import { announcementMessages } from "../data/brand";
+
 export default function AnnouncementBar() {
   return (
     <div className="announcement-bar" aria-label="Información de la tienda">
-      <p>
-        Productos regionales de Mendoza
-        <span aria-hidden="true"> · </span>
-        <span className="announcement-detail">
-          Aceites, frutos secos y sabores seleccionados
-        </span>
+      <p className="announcement-bar__messages">
+        {announcementMessages.map((message, index) => (
+          <Fragment key={message}>
+            {index > 0 ? (
+              <span
+                className="announcement-bar__separator"
+                aria-hidden="true"
+              >
+                |
+              </span>
+            ) : null}
+            <span className="announcement-bar__message">{message}</span>
+          </Fragment>
+        ))}
       </p>
     </div>
   );

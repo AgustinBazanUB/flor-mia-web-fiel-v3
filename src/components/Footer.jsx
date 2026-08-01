@@ -1,62 +1,33 @@
-import { useState } from "react";
-import { ArrowUpRight, Instagram } from "lucide-react";
+import { Clock3, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "../router";
-import { brand } from "../data/brand";
-
-const columns = [
-  {
-    title: "Comprar",
-    links: [
-      ["Todos los productos", "/productos"],
-      ["Aceites de oliva", "/productos?categoria=olive_oil"],
-      ["Frutos secos", "/productos?categoria=nuts"],
-      ["Aceitunas", "/productos?categoria=olives"],
-      ["Mermeladas y sales", "/productos?categoria=jams"],
-      ["Regalos", "/productos?categoria=gifts"],
-    ],
-  },
-  {
-    title: "Flor Mía",
-    links: [
-      ["Nuestra historia", "/nosotros"],
-      ["El local", "/nosotros#local"],
-      ["Origen y selección", "/nosotros#origen"],
-      ["Opiniones", "/#opiniones"],
-      ["Contacto", "/#contacto"],
-    ],
-  },
-  {
-    title: "Ayuda",
-    links: [
-      ["Envíos y retiros", "/#compra-clara"],
-      ["Medios de pago", "/#compra-clara"],
-      ["Cambios", "/#compra-clara"],
-      ["Preguntas frecuentes", "/#faq"],
-    ],
-  },
-];
+import { brand, footerNavigation } from "../data/brand";
 
 export default function Footer() {
-  const [newsletterStatus, setNewsletterStatus] = useState("");
-
-  const onSubmit = (event) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    if (!form.get("consent")) {
-      setNewsletterStatus("Necesitamos tu consentimiento para suscribirte.");
-      return;
-    }
-    setNewsletterStatus(
-      "El formulario está preparado. La integración de newsletter sigue pendiente.",
-    );
-  };
+  const { contact } = brand;
+  const hasContactInformation = Boolean(
+    contact.address ||
+      contact.openingHours ||
+      contact.phone ||
+      contact.email,
+  );
 
   return (
     <footer className="site-footer" id="contacto">
       <div className="container site-footer__top">
         <div className="footer-intro">
-          <Link className="wordmark" to="/">
-            flor mía
+          <Link
+            className="wordmark footer-logo"
+            to="/"
+            aria-label="Flor Mía - Inicio"
+          >
+            <img
+              className="footer-logo__image"
+              src={brand.logo.src}
+              width={brand.logo.width}
+              height={brand.logo.height}
+              alt=""
+              loading="lazy"
+            />
           </Link>
           <p>{brand.tagline}</p>
           <a
@@ -64,68 +35,80 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             className="footer-social"
+            aria-label="Flor Mía en Instagram, abre en una nueva pestaña"
           >
             <Instagram size={19} aria-hidden="true" />
-            Instagram
-            <ArrowUpRight size={16} aria-hidden="true" />
+            <span>Instagram</span>
           </a>
-          <p className="footer-pending">
-            WhatsApp, email, dirección y horarios pendientes de confirmación.
-          </p>
         </div>
 
         <div className="footer-columns">
-          {columns.map((column) => (
+          {footerNavigation.map((column) => (
             <nav aria-label={column.title} key={column.title}>
               <h2>{column.title}</h2>
-              {column.links.map(([label, href]) => (
-                <Link to={href} key={label}>
-                  {label}
+              {column.links.map((link) => (
+                <Link to={link.to} key={link.label}>
+                  {link.label}
                 </Link>
               ))}
             </nav>
           ))}
-        </div>
+          <section
+            className="footer-local"
+            aria-labelledby="footer-local-title"
+          >
+            <h2 id="footer-local-title">Retirá en nuestro local</h2>
 
-        <form className="newsletter" onSubmit={onSubmit}>
-          <h2>Novedades, productos y sabores de Mendoza.</h2>
-          <label className="field-label" htmlFor="newsletter-email">
-            Tu email
-          </label>
-          <div className="newsletter__field">
-            <input
-              id="newsletter-email"
-              name="email"
-              type="email"
-              placeholder="nombre@ejemplo.com"
-              autoComplete="email"
-              required
-            />
-            <button className="button button--gold" type="submit">
-              Suscribirme
-            </button>
-          </div>
-          <label className="checkbox-label">
-            <input type="checkbox" name="consent" value="yes" />
-            <span>Acepto recibir novedades de Flor Mía.</span>
-          </label>
-          <p className="form-status" role="status">
-            {newsletterStatus}
-          </p>
-        </form>
+            {contact.address ? (
+              <div className="footer-contact-item">
+                <MapPin size={16} aria-hidden="true" />
+                {contact.mapUrl ? (
+                  <a href={contact.mapUrl} target="_blank" rel="noreferrer">
+                    {contact.address}
+                  </a>
+                ) : (
+                  <span>{contact.address}</span>
+                )}
+              </div>
+            ) : null}
+
+            {contact.openingHours ? (
+              <div className="footer-contact-item">
+                <Clock3 size={16} aria-hidden="true" />
+                <span>{contact.openingHours}</span>
+              </div>
+            ) : null}
+
+            {contact.phone ? (
+              <div className="footer-contact-item">
+                <Phone size={16} aria-hidden="true" />
+                {contact.phoneUrl ? (
+                  <a href={contact.phoneUrl}>{contact.phone}</a>
+                ) : (
+                  <span>{contact.phone}</span>
+                )}
+              </div>
+            ) : null}
+
+            {contact.email ? (
+              <div className="footer-contact-item">
+                <Mail size={16} aria-hidden="true" />
+                <a href={contact.emailUrl ?? `mailto:${contact.email}`}>
+                  {contact.email}
+                </a>
+              </div>
+            ) : null}
+
+            {!hasContactInformation ? (
+              <p className="footer-pending">{contact.pendingMessage}</p>
+            ) : null}
+          </section>
+        </div>
       </div>
 
       <div className="container footer-legal">
         <span>© {new Date().getFullYear()} Flor Mía</span>
-        <div aria-label="Información legal pendiente">
-          <span>Términos</span>
-          <span>Privacidad</span>
-          <span>Defensa del consumidor</span>
-        </div>
-        <span>Contenido legal pendiente</span>
-      </div>
-      <div className="footer-wordmark" aria-hidden="true">
-        FLOR MÍA
+        <span>Productos regionales de Mendoza</span>
       </div>
     </footer>
   );

@@ -18,6 +18,12 @@ test("encuentra productos por categoría, uso y ocasión", () => {
 
   const mermelada = filterProducts(products, categoryById, "mermeladas");
   assert.ok(mermelada.some((product) => product.id === "jam-pending"));
+
+  const desayuno = filterProducts(products, categoryById, "desayuno");
+  assert.ok(desayuno.some((product) => product.id === "jam-pending"));
+
+  const regalo = filterProducts(products, categoryById, "para regalar");
+  assert.ok(regalo.length > 0);
 });
 
 test("tolera errores de escritura razonables", () => {

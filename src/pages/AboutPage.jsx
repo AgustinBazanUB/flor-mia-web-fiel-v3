@@ -1,6 +1,6 @@
 import { Link } from "../router";
 import PageMeta from "../components/PageMeta";
-import PlaceholderImage from "../components/PlaceholderImage";
+import { assetsManifest } from "../data/assetsManifest";
 
 export default function AboutPage() {
   return (
@@ -23,13 +23,13 @@ export default function AboutPage() {
 
       <section className="section" id="origen">
         <div className="container story-grid">
-          <PlaceholderImage
-            src="/images/placeholders/local-flor-mia-productos-mendocinos.webp"
-            alt="Espacio reservado para una fotografía real del local Flor Mía"
-            label="LOCAL REAL: estanterías y productos Flor Mía"
-            aspectRatio="4 / 5"
-            eager
-            sizes="(max-width: 900px) 100vw, 48vw"
+          <img
+            className="about-local-image"
+            src={assetsManifest.local.story.src}
+            width={assetsManifest.local.story.width}
+            height={assetsManifest.local.story.height}
+            alt={assetsManifest.local.story.alt}
+            decoding="async"
           />
           <div className="story-content">
             <p className="eyebrow">NUESTRA HISTORIA</p>
@@ -40,10 +40,10 @@ export default function AboutPage() {
               frutos secos, aceitunas, mermeladas y sales.
             </p>
             <p>
-              Todavía faltan la historia fundacional, las fotografías del local,
-              la dirección, los horarios y la información real sobre
-              productores. Por eso esta versión no afirma producción propia,
-              finca, premios ni certificaciones.
+              Todavía faltan la historia fundacional completa, la dirección,
+              los horarios y la información real sobre productores. Por eso
+              esta versión no afirma producción propia, finca, premios ni
+              certificaciones.
             </p>
             <Link className="button" to="/productos">
               Explorar la selección

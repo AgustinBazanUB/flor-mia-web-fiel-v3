@@ -3,23 +3,77 @@ export const brand = {
   tagline: "De Mendoza a tu mesa.",
   description:
     "Tienda premium de productos regionales mendocinos, con el aceite de oliva como gran especialidad.",
+  logo: {
+    src: "/images/flor-mia/logo-flor-mia.svg",
+    width: 223,
+    height: 247,
+  },
   instagram: "https://www.instagram.com/flormia.mdz/",
   contact: {
     whatsapp: null,
     whatsappUrl: null,
+    phone: null,
+    phoneUrl: null,
     email: null,
+    emailUrl: null,
     address: null,
+    mapUrl: null,
     openingHours: null,
+    pendingMessage:
+      "Dirección, teléfono, email y horarios pendientes de confirmación.",
   },
 };
 
+export const announcementMessages = [
+  "PRODUCTOS REGIONALES ORIGINARIOS DE MENDOZA",
+  "ENVÍOS A TODO EL PAÍS",
+  "RETIRO EN LOCAL",
+];
+
 export const navigation = [
-  { label: "Aceites", to: "/productos?categoria=olive_oil" },
+  { label: "Inicio", to: "/" },
+  { label: "Tienda", to: "/productos" },
+  { label: "Aceites de oliva", to: "/productos?categoria=olive_oil" },
   { label: "Frutos secos", to: "/productos?categoria=nuts" },
   { label: "Aceitunas", to: "/productos?categoria=olives" },
-  { label: "Mermeladas y sales", to: "/productos?categoria=jams" },
+  { label: "Mermeladas", to: "/productos?categoria=jams" },
   { label: "Regalos", to: "/productos?categoria=gifts" },
-  { label: "Nuestra historia", to: "/nosotros" },
+  { label: "Nosotros", to: "/nosotros" },
+  { label: "Contacto", to: "/#contacto" },
+];
+
+export const footerNavigation = [
+  {
+    title: "Tienda",
+    links: [
+      { label: "Aceites de oliva", to: "/productos?categoria=olive_oil" },
+      { label: "Frutos secos", to: "/productos?categoria=nuts" },
+      { label: "Aceitunas", to: "/productos?categoria=olives" },
+      { label: "Mermeladas", to: "/productos?categoria=jams" },
+      {
+        label: "Sales condimentadas",
+        to: "/productos?categoria=seasoned_salts",
+      },
+      { label: "Regalos", to: "/productos?categoria=gifts" },
+    ],
+  },
+  {
+    title: "Información",
+    links: [
+      { label: "Nosotros", to: "/nosotros" },
+      { label: "Nuestra historia", to: "/nosotros#origen" },
+      { label: "Origen y selección", to: "/nosotros#origen" },
+      { label: "Contacto", to: "/#contacto" },
+    ],
+  },
+  {
+    title: "Ayuda",
+    links: [
+      { label: "Envíos y retiros", to: "/checkout" },
+      { label: "Medios de pago", to: "/checkout" },
+      { label: "Contacto", to: "/#contacto" },
+    ],
+  },
 ];
 
 export const trustItems = [

@@ -86,8 +86,9 @@ export default function CatalogPage() {
           <p className="eyebrow">CATÁLOGO FLOR MÍA</p>
           <h1>Sabores mendocinos para elegir a tu manera.</h1>
           <p>
-            Buscá por producto, categoría u ocasión. Los precios, stock,
-            formatos y fotografías reales están pendientes de carga.
+            Buscá por producto, categoría u ocasión. Las fotografías y
+            presentaciones visibles corresponden al catálogo recibido; los
+            precios y el stock siguen pendientes.
           </p>
         </div>
       </section>

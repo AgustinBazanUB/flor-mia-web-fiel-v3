@@ -1,9 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Link, useLocation } from "../router";
-import { navigation } from "../data/brand";
+import { brand, navigation } from "../data/brand";
 import { useCart } from "../context/CartContext";
 import SearchModal from "./SearchModal";
+
+function isCurrentNavigationItem(to, location) {
+  const target = new URL(to, window.location.origin);
+
+  if (target.pathname !== location.pathname) return false;
+  if (target.hash) return target.hash === location.hash;
+  if (target.pathname === "/" && location.hash) return false;
+  if (target.search) return target.search === location.search;
+
+  if (target.pathname === "/productos") {
+    return !new URLSearchParams(location.search).has("categoria");
+  }
+
+  return true;
+}
 
 export default function Header() {
   const location = useLocation();
@@ -11,7 +26,9 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const isHome = location.pathname === "/";
+  const menuButtonRef = useRef(null);
+  const mobileNavigationRef = useRef(null);
+  const searchTriggerRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -27,28 +44,77 @@ export default function Header() {
 
   useEffect(() => {
     if (!menuOpen) return undefined;
+
     const onKeyDown = (event) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      window.requestAnimationFrame(() => menuButtonRef.current?.focus());
     };
+    const onPointerDown = (event) => {
+      if (
+        mobileNavigationRef.current?.contains(event.target) ||
+        menuButtonRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+      setMenuOpen(false);
+    };
+
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
   }, [menuOpen]);
 
   const closeSearch = useCallback(() => setSearchOpen(false), []);
+  const openSearch = (event) => {
+    searchTriggerRef.current = event.currentTarget;
+    setMenuOpen(false);
+    setSearchOpen(true);
+  };
+  const toggleMenu = () => {
+    setSearchOpen(false);
+    setMenuOpen((current) => !current);
+  };
+  const handleCartClick = () => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+    openCart();
+  };
 
   return (
     <>
       <header
-        className={`site-header ${isHome ? "site-header--overlay" : "site-header--solid"} ${scrolled ? "is-scrolled" : ""}`}
+        className={`site-header site-header--solid ${scrolled ? "is-scrolled" : ""}`}
       >
         <div className="site-header__inner">
-          <Link className="wordmark" to="/" aria-label="Flor Mía, inicio">
-            flor mía
+          <Link
+            className="wordmark header-logo"
+            to="/"
+            aria-label="Flor Mía - Inicio"
+          >
+            <img
+              className="header-logo__image"
+              src={brand.logo.src}
+              width={brand.logo.width}
+              height={brand.logo.height}
+              alt=""
+            />
           </Link>
 
           <nav className="desktop-nav" aria-label="Navegación principal">
             {navigation.map((item) => (
-              <Link to={item.to} key={item.label}>
+              <Link
+                to={item.to}
+                key={item.label}
+                aria-current={
+                  isCurrentNavigationItem(item.to, location)
+                    ? "page"
+                    : undefined
+                }
+              >
                 {item.label}
               </Link>
             ))}
@@ -57,29 +123,41 @@ export default function Header() {
           <div className="header-actions">
             <button
               type="button"
-              className="header-action"
-              onClick={() => setSearchOpen(true)}
+              className="header-search desktop-only"
+              onClick={openSearch}
               aria-label="Buscar productos"
+              aria-haspopup="dialog"
+              aria-expanded={searchOpen}
+            >
+              <span>Buscar productos...</span>
+              <Search aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="header-action mobile-menu-button mobile-search-button"
+              onClick={openSearch}
+              aria-label="Buscar productos"
+              aria-haspopup="dialog"
+              aria-expanded={searchOpen}
             >
               <Search aria-hidden="true" />
-              <span className="desktop-only">Buscar</span>
             </button>
             <button
               type="button"
               className="header-action cart-action"
-              onClick={openCart}
+              onClick={handleCartClick}
               aria-label={`Abrir carrito, ${unitCount} ${unitCount === 1 ? "producto" : "productos"}`}
             >
-              <ShoppingBag aria-hidden="true" />
-              <span className="cart-count">{unitCount}</span>
+              <ShoppingCart aria-hidden="true" />
+              <span className="cart-count" aria-hidden="true">
+                {unitCount}
+              </span>
             </button>
-            <Link className="button button--small desktop-only" to="/productos">
-              Comprar
-            </Link>
             <button
+              ref={menuButtonRef}
               type="button"
               className="header-action mobile-menu-button"
-              onClick={() => setMenuOpen((current) => !current)}
+              onClick={toggleMenu}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
               aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -91,22 +169,33 @@ export default function Header() {
 
         {menuOpen ? (
           <nav
+            ref={mobileNavigationRef}
             className="mobile-nav"
             id="mobile-navigation"
             aria-label="Navegación móvil"
           >
             {navigation.map((item) => (
-              <Link to={item.to} key={item.label}>
+              <Link
+                to={item.to}
+                key={item.label}
+                onClick={() => setMenuOpen(false)}
+                aria-current={
+                  isCurrentNavigationItem(item.to, location)
+                    ? "page"
+                    : undefined
+                }
+              >
                 {item.label}
               </Link>
             ))}
-            <Link className="button" to="/productos">
-              Explorar todos los productos
-            </Link>
           </nav>
         ) : null}
       </header>
-      <SearchModal open={searchOpen} onClose={closeSearch} />
+      <SearchModal
+        open={searchOpen}
+        onClose={closeSearch}
+        returnFocusRef={searchTriggerRef}
+      />
     </>
   );
 }

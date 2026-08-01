@@ -1507,6 +1507,14 @@ input::placeholder {
   gap: clamp(44px, 7vw, 100px);
 }
 
+.about-local-image {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--border);
+  object-fit: cover;
+  object-position: center;
+}
+
 .story-content h2 {
   font-size: clamp(44px, 5vw, 72px);
 }
@@ -2411,6 +2419,15 @@ input::placeholder {
 
 .product-detail > .placeholder-image {
   max-height: 820px;
+}
+
+.product-detail__media {
+  border-style: solid;
+  background: var(--surface);
+}
+
+.product-detail__media img {
+  object-fit: contain;
 }
 
 .product-detail__content {

@@ -10,6 +10,7 @@ import "@fontsource/manrope/latin-500.css";
 import "@fontsource/manrope/latin-600.css";
 import "@fontsource/manrope/latin-700.css";
 import "./styles.css";
+import "./styles-v3.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -7,6 +7,8 @@ import { categories } from "../src/data/categories.js";
 import { products } from "../src/data/products.js";
 import { oliveProfiles } from "../src/data/oliveProfiles.js";
 import { trustItems } from "../src/data/brand.js";
+import { assetsManifest } from "../src/data/assetsManifest.js";
+import { promotions } from "../src/data/promotions.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(currentDirectory, "..");
@@ -32,7 +34,7 @@ test("los datos comerciales desconocidos permanecen explícitamente pendientes",
   }
 });
 
-test("todos los productos y varietales tienen un placeholder local", () => {
+test("todos los productos y varietales usan una imagen local existente", () => {
   for (const item of [...products, ...oliveProfiles]) {
     const relative = item.image.replace(/^\//, "");
     assert.equal(
@@ -41,6 +43,33 @@ test("todos los productos y varietales tienen un placeholder local", () => {
       relative,
     );
   }
+});
+
+test("el manifiesto usa el logo, el local y los seis destacados reales", () => {
+  const requiredAssets = [
+    assetsManifest.brand.logo,
+    assetsManifest.local.story,
+    ...assetsManifest.local.hero.variants,
+    ...assetsManifest.featured,
+  ];
+
+  for (const asset of requiredAssets) {
+    const relative = asset.src.replace(/^\//, "");
+    assert.match(relative, /^images\/flor-mia\//);
+    assert.equal(existsSync(resolve(projectRoot, "public", relative)), true, relative);
+  }
+
+  assert.equal(assetsManifest.featured.length, 6);
+});
+
+test("la home solo publica las dos promociones aprobadas", () => {
+  assert.deepEqual(
+    promotions.map(({ title, subtitle }) => [title, subtitle]),
+    [
+      ["¡Promociones!", "Envío sin cargo AMBA"],
+      ["3 cuotas sin interés", "Miércoles y sábados"],
+    ],
+  );
 });
 
 test("las seis categorías y los seis varietales requeridos están presentes", () => {

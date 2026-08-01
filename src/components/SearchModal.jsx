@@ -1,27 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { X } from "lucide-react";
 import SearchExperience from "./SearchExperience";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
-export default function SearchModal({ open, onClose }) {
+export default function SearchModal({ open, onClose, returnFocusRef }) {
   const dialogRef = useRef(null);
 
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const previousFocus = document.activeElement;
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    document.body.classList.add("no-scroll");
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.classList.remove("no-scroll");
-      previousFocus?.focus?.();
-    };
-  }, [open, onClose]);
+  useFocusTrap({
+    active: open,
+    containerRef: dialogRef,
+    returnFocusRef,
+    onEscape: onClose,
+  });
 
   if (!open) return null;
 
@@ -32,6 +22,7 @@ export default function SearchModal({ open, onClose }) {
       aria-modal="true"
       aria-label="Buscar en Flor Mía"
       ref={dialogRef}
+      tabIndex={-1}
     >
       <button
         type="button"

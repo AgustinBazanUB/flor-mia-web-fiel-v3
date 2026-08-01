@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { Link } from "../router";
 import { categoryById } from "../data/categories";
 import { productById } from "../data/products";
 import { useCart } from "../context/CartContext";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 const suggestionByCategory = {
   olive_oil: "olives-selection",
@@ -24,11 +25,15 @@ export default function CartDrawer() {
     addItem,
     hasPendingPrices,
   } = useCart();
+  const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
 
-  useEffect(() => {
-    if (isCartOpen) closeButtonRef.current?.focus();
-  }, [isCartOpen]);
+  useFocusTrap({
+    active: isCartOpen,
+    containerRef: dialogRef,
+    initialFocusRef: closeButtonRef,
+    onEscape: closeCart,
+  });
 
   if (!isCartOpen) return null;
 
@@ -41,7 +46,14 @@ export default function CartDrawer() {
       : null;
 
   return (
-    <div className="cart-layer" role="dialog" aria-modal="true" aria-label="Carrito">
+    <div
+      className="cart-layer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Carrito"
+      ref={dialogRef}
+      tabIndex={-1}
+    >
       <button
         type="button"
         className="cart-backdrop"

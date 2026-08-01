@@ -15,6 +15,13 @@ const STOP_WORDS = new Set([
   "y",
 ]);
 
+const OCCASION_ALIASES = {
+  breakfast: "desayuno desayunos merienda",
+  everyday: "diario cotidiana cotidiano todos los días",
+  gift: "regalo regalos regalar obsequio",
+  picada: "picada picadas aperitivo",
+};
+
 export function normalizeText(value = "") {
   return String(value)
     .normalize("NFD")
@@ -62,7 +69,9 @@ function flattenSearchValues(product, category) {
     product.formats,
     product.tags,
     product.uses,
-    product.occasions,
+    product.occasions?.map(
+      (occasion) => `${occasion} ${OCCASION_ALIASES[occasion] ?? ""}`,
+    ),
     Object.values(product.attributes ?? {}),
   ]
     .flat(Infinity)

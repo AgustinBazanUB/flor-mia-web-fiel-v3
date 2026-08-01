@@ -6,6 +6,7 @@ import ProductCard from "../components/ProductCard";
 import { useCart } from "../context/CartContext";
 import { categoryById } from "../data/categories";
 import { products } from "../data/products";
+import { getProductAsset } from "../data/assetsManifest";
 import { trackEvent } from "../utils/analytics";
 import { useEffect } from "react";
 
@@ -48,6 +49,7 @@ export default function ProductPage() {
   }
 
   const category = categoryById[product.categoryId];
+  const productAsset = getProductAsset(product.id);
   const relatedCategories = crossSellByCategory[product.categoryId] ?? [];
   const relatedProducts = products
     .filter(
@@ -61,12 +63,56 @@ export default function ProductPage() {
     openCart();
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Productos",
+            item: `${window.location.origin}/productos`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: category.name,
+            item: `${window.location.origin}/productos?categoria=${category.id}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: product.name,
+            item: window.location.href,
+          },
+        ],
+      },
+      {
+        "@type": "Product",
+        name: product.name,
+        description: product.description,
+        image: `${window.location.origin}${product.image}`,
+        category: category.name,
+        sku: product.id,
+        brand: {
+          "@type": "Brand",
+          name: "Flor Mía",
+        },
+      },
+    ],
+  };
+
   return (
     <main id="main-content" className="page-shell product-page">
       <PageMeta
         title={`${product.name} | Flor Mía`}
         description={`${product.description} Datos comerciales pendientes de confirmación.`}
       />
+      <script type="application/ld+json">
+        {JSON.stringify(structuredData)}
+      </script>
 
       <div className="container breadcrumbs" aria-label="Migas de pan">
         <Link to="/productos">
@@ -82,11 +128,13 @@ export default function ProductPage() {
       <section className="container product-detail">
         <PlaceholderImage
           src={product.image}
-          alt={`Espacio reservado para la fotografía real de ${product.name}`}
-          label={`PRODUCTO REAL: ${category.shortName} · ${product.name}`}
+          alt={product.imageAlt ?? `Fotografía real de ${product.name}`}
+          className="product-detail__media"
           aspectRatio="4 / 5"
           eager
           sizes="(max-width: 900px) 100vw, 50vw"
+          width={productAsset?.width}
+          height={productAsset?.height}
         />
         <div className="product-detail__content">
           <p className="eyebrow">{category.name.toUpperCase()}</p>
@@ -97,8 +145,8 @@ export default function ProductPage() {
           <div className="pending-panel">
             <strong>Ficha comercial pendiente</strong>
             <p>
-              Precio, stock, presentación, fotografía y datos técnicos deben ser
-              confirmados por Flor Mía antes de vender.
+              Precio, stock y datos técnicos deben ser confirmados por Flor Mía
+              antes de vender.
             </p>
           </div>
 
