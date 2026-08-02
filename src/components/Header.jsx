@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Link, useLocation } from "../router";
-import { brand, navigation } from "../data/brand";
+import { brand, mobileNavigation, navigation } from "../data/brand";
 import { useCart } from "../context/CartContext";
 import SearchModal from "./SearchModal";
 
@@ -14,7 +14,10 @@ function isCurrentNavigationItem(to, location) {
   if (target.search) return target.search === location.search;
 
   if (target.pathname === "/productos") {
-    return !new URLSearchParams(location.search).has("categoria");
+    const currentSearch = new URLSearchParams(location.search);
+    return (
+      !currentSearch.has("categoria") && !currentSearch.has("coleccion")
+    );
   }
 
   return true;
@@ -174,7 +177,7 @@ export default function Header() {
             id="mobile-navigation"
             aria-label="Navegación móvil"
           >
-            {navigation.map((item) => (
+            {mobileNavigation.map((item) => (
               <Link
                 to={item.to}
                 key={item.label}
