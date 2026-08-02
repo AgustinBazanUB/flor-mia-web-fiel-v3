@@ -227,6 +227,18 @@ export default function HomePage() {
     .map((profileId) => oliveProfileById[profileId])
     .filter(Boolean);
 
+  const handleOilGuideScroll = () => {
+    const oilGuide = document.getElementById("guia-aceites");
+    if (!oilGuide) return;
+    const prefersReducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    oilGuide.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -281,14 +293,15 @@ export default function HomePage() {
                 disfrutar la esencia de Mendoza todos los días.
               </p>
               <div className="fm-hero__actions">
-                <Link className="fm-button fm-button--gold" to="/productos">
-                  EXPLORAR TIENDA
-                </Link>
-                <Link
-                  className="fm-button fm-button--outline"
-                  to="/productos?categoria=olive_oil"
+                <button
+                  className="fm-button fm-button--gold"
+                  type="button"
+                  onClick={handleOilGuideScroll}
                 >
-                  VER ACEITES
+                  CONOCÉ TU AOVE
+                </button>
+                <Link className="fm-button fm-button--black" to="/productos">
+                  CONOCER MÁS PRODUCTOS
                 </Link>
               </div>
             </div>
@@ -389,7 +402,7 @@ export default function HomePage() {
               <div className="fm-oil-guide__copy">
                 <p className="fm-kicker">ACEITES DE OLIVA SELECCIONADOS</p>
                 <h2 id="oil-guide-title">
-                  Elegí el aceite que mejor va con vos.
+                  Elegí el oliva ideal para cada ocasión.
                 </h2>
                 <p>
                   Descubrí nuestras variedades y encontrá el perfil ideal para

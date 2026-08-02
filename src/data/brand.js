@@ -42,6 +42,21 @@ export const navigation = [
   { label: "Contacto", to: "/#contacto" },
 ];
 
+export const mobileNavigation = [
+  { label: "Inicio", to: "/" },
+  { label: "Tienda", to: "/productos" },
+  { label: "AOVE", to: "/productos?categoria=olive_oil" },
+  { label: "Frutos secos", to: "/productos?categoria=nuts" },
+  { label: "Vinos", to: "/productos?categoria=wines" },
+  {
+    label: "Productos Regionales Mdz",
+    to: "/productos?coleccion=regionales",
+  },
+  { label: "Regalos pre-armados", to: "/productos?categoria=gifts" },
+  { label: "Nosotros", to: "/nosotros" },
+  { label: "Contacto", to: "/#contacto" },
+];
+
 export const footerNavigation = [
   {
     title: "Tienda",
