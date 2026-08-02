@@ -1,0 +1,1 @@
+Disparo técnico temporal para verificar y ejecutar el despliegue de producción en Netlify.
