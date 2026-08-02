@@ -1,12 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { categories } from "../src/data/categories.js";
+import {
+  catalogCollections,
+  virtualCatalogCategories,
+} from "../src/data/catalogViews.js";
 import { productById, products } from "../src/data/products.js";
 import { oliveProfiles } from "../src/data/oliveProfiles.js";
-import { announcementMessages, trustItems } from "../src/data/brand.js";
+import {
+  announcementMessages,
+  mobileNavigation,
+  navigation,
+  trustItems,
+} from "../src/data/brand.js";
 import { assetsManifest } from "../src/data/assetsManifest.js";
 import { promotions } from "../src/data/promotions.js";
 
@@ -68,6 +77,92 @@ test("la barra informativa conserva los tres mensajes aprobados", () => {
     "LOCAL EN CABA",
     "CUOTAS SIN INTERÉS",
   ]);
+});
+
+test("la navegación de escritorio conserva sus accesos actuales", () => {
+  assert.deepEqual(
+    navigation.map(({ label, to }) => [label, to]),
+    [
+      ["Inicio", "/"],
+      ["Tienda", "/productos"],
+      ["Aceites de oliva", "/productos?categoria=olive_oil"],
+      ["Frutos secos", "/productos?categoria=nuts"],
+      ["Aceitunas", "/productos?categoria=olives"],
+      ["Mermeladas", "/productos?categoria=jams"],
+      ["Regalos", "/productos?categoria=gifts"],
+      ["Nosotros", "/nosotros"],
+      ["Contacto", "/#contacto"],
+    ],
+  );
+});
+
+test("el menú mobile tiene el orden y destinos solicitados", () => {
+  assert.deepEqual(
+    mobileNavigation.map(({ label, to }) => [label, to]),
+    [
+      ["Inicio", "/"],
+      ["Tienda", "/productos"],
+      ["AOVE", "/productos?categoria=olive_oil"],
+      ["Frutos secos", "/productos?categoria=nuts"],
+      ["Vinos", "/productos?categoria=wines"],
+      ["Productos Regionales Mdz", "/productos?coleccion=regionales"],
+      ["Regalos pre-armados", "/productos?categoria=gifts"],
+      ["Nosotros", "/nosotros"],
+      ["Contacto", "/#contacto"],
+    ],
+  );
+  assert.equal(
+    mobileNavigation.some(({ label }) => label === "Aceitunas"),
+    false,
+  );
+  assert.equal(
+    mobileNavigation.some(({ label }) => label === "Mermeladas"),
+    false,
+  );
+});
+
+test("la colección regional agrupa categorías existentes sin duplicar productos", () => {
+  assert.deepEqual(catalogCollections.regionales.categoryIds, [
+    "olives",
+    "jams",
+    "seasoned_salts",
+  ]);
+  const regionalProductIds = products
+    .filter((product) =>
+      catalogCollections.regionales.categoryIds.includes(product.categoryId),
+    )
+    .map((product) => product.id);
+  assert.deepEqual(regionalProductIds, [
+    "olives-selection",
+    "jam-pending",
+    "salt-malbec",
+  ]);
+  assert.equal(new Set(regionalProductIds).size, regionalProductIds.length);
+});
+
+test("vinos conserva un estado vacío honesto", () => {
+  assert.equal(virtualCatalogCategories.wines.name, "Vinos");
+  assert.equal(
+    products.some((product) => product.categoryId === "wines"),
+    false,
+  );
+});
+
+test("los CTAs y el título AOVE usan los textos aprobados", () => {
+  const homePageSource = readFileSync(
+    resolve(projectRoot, "src/pages/HomePage.jsx"),
+    "utf8",
+  );
+  assert.match(homePageSource, /CONOCÉ TU AOVE/);
+  assert.match(homePageSource, /CONOCER MÁS PRODUCTOS/);
+  assert.match(homePageSource, /fm-button--black/);
+  assert.match(
+    homePageSource,
+    /Elegí el oliva ideal para cada ocasión\./,
+  );
+  assert.doesNotMatch(homePageSource, /Elegí el aceite que mejor va con vos\./);
+  assert.match(homePageSource, /scrollIntoView/);
+  assert.match(homePageSource, /prefers-reduced-motion/);
 });
 
 test("la home solo publica las dos promociones aprobadas", () => {
