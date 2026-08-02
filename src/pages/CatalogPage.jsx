@@ -5,6 +5,10 @@ import PageMeta from "../components/PageMeta";
 import ProductCard from "../components/ProductCard";
 import SectionHeading from "../components/SectionHeading";
 import { categories, categoryById } from "../data/categories";
+import {
+  catalogCollections,
+  virtualCatalogCategories,
+} from "../data/catalogViews";
 import { products } from "../data/products";
 import { matchesSearch } from "../utils/search";
 import { trackEvent } from "../utils/analytics";
@@ -16,6 +20,7 @@ const categoryAliases = {
   mermeladas: "jams",
   sales: "seasoned_salts",
   regalos: "gifts",
+  vinos: "wines",
 };
 
 const occasions = [
@@ -30,14 +35,21 @@ export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rawCategory = searchParams.get("categoria") ?? "";
   const categoryId = categoryAliases[rawCategory] ?? rawCategory;
+  const collectionId = searchParams.get("coleccion") ?? "";
   const query = searchParams.get("q") ?? "";
   const occasion = searchParams.get("ocasion") ?? "";
+  const activeCategory =
+    categoryById[categoryId] ?? virtualCatalogCategories[categoryId];
+  const activeCollection = catalogCollections[collectionId];
+  const collectionCategoryIds = activeCollection?.categoryIds ?? [];
 
   const filteredProducts = useMemo(
     () =>
       products.filter((product) => {
         const matchesCategory =
           !categoryId || product.categoryId === categoryId;
+        const matchesCollection =
+          !activeCollection || collectionCategoryIds.includes(product.categoryId);
         const matchesOccasion =
           !occasion || product.occasions.includes(occasion);
         const matchesQuery = matchesSearch(
@@ -45,16 +57,22 @@ export default function CatalogPage() {
           categoryById[product.categoryId],
           query,
         );
-        return matchesCategory && matchesOccasion && matchesQuery;
+        return (
+          matchesCategory &&
+          matchesCollection &&
+          matchesOccasion &&
+          matchesQuery
+        );
       }),
-    [categoryId, occasion, query],
+    [activeCollection, categoryId, collectionCategoryIds, occasion, query],
   );
 
   useEffect(() => {
     trackEvent("view_item_list", {
-      item_list_name: categoryId
-        ? categoryById[categoryId]?.name
-        : "Todos los productos",
+      item_list_name:
+        activeCollection?.name ??
+        activeCategory?.name ??
+        "Todos los productos",
       items: filteredProducts.map((product) => ({
         item_id: product.id,
         item_name: product.name,
@@ -62,7 +80,7 @@ export default function CatalogPage() {
         price: product.price,
       })),
     });
-  }, [categoryId, filteredProducts]);
+  }, [activeCategory, activeCollection, filteredProducts]);
 
   const updateParam = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -71,13 +89,34 @@ export default function CatalogPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const hasFilters = Boolean(categoryId || query || occasion);
-  const activeCategory = categoryById[categoryId];
+  const updateCategory = (value) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("coleccion");
+    if (value) next.set("categoria", value);
+    else next.delete("categoria");
+    setSearchParams(next, { replace: true });
+  };
+
+  const clearCatalogView = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("categoria");
+    next.delete("coleccion");
+    setSearchParams(next, { replace: true });
+  };
+
+  const hasFilters = Boolean(categoryId || collectionId || query || occasion);
+  const catalogHeading =
+    activeCollection?.name ?? activeCategory?.name ?? "Toda la selección.";
+  const catalogDescription =
+    activeCollection?.description ??
+    activeCategory?.description ??
+    "Productos de distintas categorías preparados para una compra combinada.";
+  const isEmptyWineCategory = activeCategory?.id === "wines";
 
   return (
     <main id="main-content" className="page-shell catalog-page">
       <PageMeta
-        title={`${activeCategory?.name ?? "Productos"} | Flor Mía`}
+        title={`${activeCollection?.name ?? activeCategory?.name ?? "Productos"} | Flor Mía`}
         description="Explorá la selección editable de aceites, frutos secos, aceitunas, mermeladas y sales de Flor Mía."
       />
 
@@ -114,8 +153,8 @@ export default function CatalogPage() {
           <div className="catalog-category-pills" aria-label="Categorías">
             <button
               type="button"
-              className={!categoryId ? "is-selected" : ""}
-              onClick={() => updateParam("categoria", "")}
+              className={!categoryId && !collectionId ? "is-selected" : ""}
+              onClick={clearCatalogView}
             >
               Todo
             </button>
@@ -123,7 +162,7 @@ export default function CatalogPage() {
               <button
                 type="button"
                 className={categoryId === category.id ? "is-selected" : ""}
-                onClick={() => updateParam("categoria", category.id)}
+                onClick={() => updateCategory(category.id)}
                 key={category.id}
               >
                 {category.shortName}
@@ -164,11 +203,8 @@ export default function CatalogPage() {
           <div className="catalog-results__header">
             <SectionHeading
               eyebrow={`${filteredProducts.length} RESULTADOS`}
-              title={activeCategory?.name ?? "Toda la selección."}
-              body={
-                activeCategory?.description ??
-                "Productos de distintas categorías preparados para una compra combinada."
-              }
+              title={catalogHeading}
+              body={catalogDescription}
             />
             <span className="badge">DATOS COMERCIALES PENDIENTES</span>
           </div>
@@ -181,10 +217,15 @@ export default function CatalogPage() {
             </div>
           ) : (
             <div className="empty-state">
-              <h2>No encontramos productos con esos filtros.</h2>
+              <h2>
+                {isEmptyWineCategory
+                  ? "Los vinos todavía no están cargados."
+                  : "No encontramos productos con esos filtros."}
+              </h2>
               <p>
-                Probá otra categoría o limpiá la búsqueda. Las categorías vacías
-                no se muestran como si tuvieran stock.
+                {isEmptyWineCategory
+                  ? "La categoría está preparada para incorporar vinos cuando se confirmen sus datos comerciales, sin inventar productos, precios ni stock."
+                  : "Probá otra categoría o limpiá la búsqueda. Las categorías vacías no se muestran como si tuvieran stock."}
               </p>
               <button
                 className="button"
